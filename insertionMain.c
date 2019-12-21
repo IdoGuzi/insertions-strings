@@ -10,7 +10,7 @@ int main() {
     for (int i=0;i<size;i++) {
         if (i!=49) {
             printf("%d,",*(aptr+i));
-        }else printf("%d",*(aptr+i));
+        }else printf("%d\n",*(aptr+i));
     }
     return 0;
 }
