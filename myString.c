@@ -82,7 +82,6 @@ int similar(char *s, char *t, int n) {
     if (n<0) return 0;
     str[len] = '\0';
     if (strcmp(str,t)!=0) {
-        printf("Error  %s,,,%s\n", str,t);
         return 0;
     }
     return 1;

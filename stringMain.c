@@ -4,17 +4,15 @@
 
 int main() {
     char text[65536];
-    scanf("%s",text);
-    printf("%s",text);
+    int num=scanf("%[^\n]s",text);
+    char *ptr=text;
     int len = getword(text);
     char str[len];
     copyword(str,text);
     str[len]='\0';
-    char *ptr=text;
     ptr+=len+1;
     char option = *ptr;
-    printf("%c",option);
-    ptr+=3;
+    ptr+=5;
     if (option=='a'){
         print_lines(str,ptr);
     }else if (option=='b'){
