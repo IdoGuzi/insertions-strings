@@ -2,127 +2,139 @@
 #include <string.h>
 #include "myString.h"
 
-int getLine(char line[]){
-    char cha = getchar();
-
-	int i =0;
-
-    while( cha != '\n'  ){
-        line[i] = cha;
-        cha = getchar();
-        if (cha == EOF){
-            return 0;
-        }
-        if (i<LINE){
-        i++;
-        }
-        else{
-        	break;
-        }
-    }
-
-    line[i] = '\0';
-    return strlen(line);
-}
-
-
-int substring(char *str1, char *str2) {
-	char *char1 = str1;
-	char *char2 = str2;
-	while (*char1 != '\0' && *char2 != '\0') {
-
-		if (*char1 == *char2) {
-			char1++;
-			char2++;
-		}
-
-		if (*char2 == '\0') {
-			return 1;
-		}
-		char2 = str2;
-		char1++;
-
-	}
-	return 0;
-
-}
-
-
-void print_lines(char *word ) {
-    char line[LINE];
-    int size = getLine(line);
-
-    while (size != 0){
-        if (substring(line,word)){
-            printf("%s \n",line);
-        }
-        size = getLine(line);
+void copyline(char *dest, char *src){
+    char *p1 = dest;
+    char *p2 = src;
+    while (*p2!='\n' && *p2!='\0' && *p2!=EOF){
+        *p1=*p2;
+        p1++;
+        p2++;
     }
 }
 
-int getword(char w[]) {
-    char cha = getchar();
+void copyword(char *dest, char *src){
+    char *p1 = dest;
+    char *p2 = src;
+    while (*p2!=' ' && *p2!='\n' && *p2!='\t' && *p2!='\0' && *p2!=EOF){
+        *p1=*p2;
+        p1++;
+        p2++;
+    }
+}
 
-	int i =0;
-    if (cha == EOF)
+int getLine(char s[]) {
+    int count=0;
+    char c = s[count];
+    while (c!='\n' && c!= EOF && c!='\0'){
+        count++;
+        c = s[count];
+    }
+    return count;
+}
+
+int getword(char w[]){
+    int count=0;
+    char c = w[count];
+    while (c!='\n' && c!='\t' && c!=' ' && c!=EOF && c!='\0'){
+        count++;
+        c = w[count];
+    }
+    return count;
+}
+
+int substring(char *str1, char *str2){
+    char *sptr1 = str1;
+    char *sptr2 = str2;
+    if (strlen(str1)<strlen(str2)) {
         return 0;
-    while(cha != '\n' && cha != '\t' && cha != ' '){
-        w[i] = cha;
-        cha = getchar();
-        if (cha == EOF)
-            return 0;
-        if (i!=WORD){
-        i++;
-        }
-        else
-        	break;
     }
-    w[i] = '\0';
-    return strlen(w);
-}
-
-
-
-
-
-int similar (char * s, char * t, int n){
-    int sIndex = 0;
-    int tIndex = 0;
-
-    while (s[sIndex] !='\0'|| t[tIndex]!='\0'){
-        if(s[sIndex] == t[tIndex]){
-            tIndex++;
-            sIndex++;
+    int count=0;
+    while (*(sptr1+count) != '\0' && *(sptr2+count) != '\0'){
+        if (*(sptr1+count) != *(sptr2+count)) {
+            ++sptr1;
+            count = 0;
+            continue;
         }
-        else{
-            n--;
-            if (n < 0) {
-                return 0;
-            }
-            sIndex++;
+        if (*(sptr1+count) == *(sptr2+count)) {
+            count++;
+            if (count == strlen(str2)) return 1;
         }
     }
-
-    if (!s[sIndex] && !t[tIndex])
-        return 1;
-
     return 0;
 }
 
-
-
-
-
-
-
-void print_similar_words(char *word) {
-    char w[WORD];
-    int wSize = getword(w);
-
-    while (wSize !=0){
-        if (similar(w,word,1)){
-            printf("%s \n",w);
+int similar(char *s, char *t, int n) {
+    int len = strlen(t);
+    char str[len];
+    char* ptr = s;
+    int i=0;
+    if (strlen(s)-n>strlen(t)) return 0;
+    while (n>=0 && *(ptr+i)!='\0' && *(t+i)!='\0') {
+        if (*(ptr+i)==*(t+i)){
+            str[i] = *(t+i);
+            i++;
+        }else{
+            n--;
+            ptr++;
+            continue;
         }
-        wSize = getword(w);
+    }
+    if (n<0) return 0;
+    str[len] = '\0';
+    if (strcmp(str,t)!=0) {
+        printf("Error  %s,,,%s\n", str,t);
+        return 0;
+    }
+    return 1;
+}
+
+void print_lines(char *str,char *text){
+    char *sptr=text;
+    char line[LINE];
+    int index=getLine(sptr);
+    copyline(line,sptr);
+    line[index]='\0';
+    while (*(sptr)!='\0' && *(sptr)!=EOF){
+        char *lptr=sptr;
+        int wordIndex = getword(lptr);
+        char temp[WORD];
+        copyword(temp,lptr);
+        temp[wordIndex] = '\0';
+        while (*lptr!='\0' && *lptr!=EOF){
+            if (similar(temp,str,0)==1){
+                printf("%s\n",line);
+                break;
+            }
+            lptr+=wordIndex;
+            if (*lptr==' ' || *lptr=='\t') lptr+=1;
+            if (*lptr=='\n') break;
+            wordIndex = getword(lptr);
+            copyword(temp,lptr);
+            temp[wordIndex]='\0';
+        }
+        sptr+=index;
+        if (*sptr=='\n') sptr++;
+        if (*sptr=='\0') return;
+        index = getLine(sptr);
+        copyline(line,sptr);
+        line[index]='\0';
+    }
+}
+
+void print_similar_words(char *str,char *text){
+    char *sptr = text;
+    int index = getword(sptr);
+    char temp[WORD];
+    copyword(temp,sptr);
+    temp[index] = '\0';
+    while (*(sptr)!='\0' && *(sptr)!=EOF){
+        if (similar(temp,str,1)==1){
+            printf("%s\n",temp);
+        }
+        sptr+= index;
+        if (*sptr==' ' || *sptr=='\n' || *sptr=='\t') sptr+=1;
+        index = getword(sptr);
+        copyword(temp,sptr);
+        temp[index]='\0';
     }
 }
